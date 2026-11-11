@@ -1,7 +1,13 @@
 import express from "express";
+import cors from "cors";
+import { syncModels } from "./models/index.model";
+import { PORT } from "./config/env";
+import userRouter from "./user.route";
 // import { PORT } from "./config/env";
 
 const app = express();
+
+app.use(express.json());
 
 // Test du serveur (route racine)
 app.get("/", (req, res) => {
@@ -12,10 +18,29 @@ app.get("/", (req, res) => {
         );
 });
 
-app.listen(8080, async (err) => {
+// Autoriser les URL des frontends et les méthodes HTTP via CORS
+app.use(
+    cors({
+        origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    }),
+);
+
+// Déclarer les routes
+app.use("/api/users", userRouter);
+
+app.listen(PORT, async (err) => {
     if (err) {
         console.log(`Une erreur s'est produite: ${err}`);
     } else {
-        console.log(`Serveur lancé à http://localhost:8080/`);
+        try {
+            console.log(`Serveur lancé à http://localhost:${PORT}/`);
+            await syncModels();
+        } catch (error) {
+            console.error(
+                "Erreur lors de la synchronisation des modèles:",
+                error,
+            );
+        }
     }
 });
