@@ -1,0 +1,13 @@
+{
+    "name": "api",
+    "version": "1.0.0",
+    "description": "Cette API alimente tout le blog.",
+    "main": "app.ts",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Hermès Oliho",
+    "license": "ISC",
+    "type": "module"
+}
