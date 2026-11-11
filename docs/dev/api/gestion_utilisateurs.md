@@ -7,7 +7,7 @@ Cette page présente les routes disponibles pour gérer les utilisateurs.
 En développement :
 
 ```text
-http://localhost:8080/api/users
+http://localhost:8080/api/admin/users
 ```
 
 Toutes ces routes sont protégées par le middleware d'authentification JWT.
@@ -44,7 +44,7 @@ d'être enregistré.
 
 ## Lister les utilisateurs
 
-### `GET /api/users`
+### `GET /api/admin/users`
 
 ### Réponse
 
@@ -67,12 +67,12 @@ Code HTTP : `200 OK`
 
 ## Consulter un utilisateur
 
-### `GET /api/users/:id`
+### `GET /api/admin/users/:id`
 
 Exemple :
 
 ```text
-GET /api/users/1
+GET /api/admin/users/1
 ```
 
 `id` doit être un entier positif.
@@ -122,7 +122,7 @@ Utilisateur absent — `404 Not Found` :
 
 ## Créer un utilisateur
 
-### `POST /api/users`
+### `POST /api/admin/users`
 
 > Cette route sert actuellement à créer un utilisateur. Il n'y a pas de route
 > publique `/register` dans l'authentification, donc un utilisateur
@@ -190,9 +190,9 @@ Données invalides — `422 Unprocessable Entity` :
 
 ## Modifier un utilisateur
 
-### `PATCH /api/users/:id`
+### `PATCH /api/admin/users/:id`
 
-La route `PUT /api/users/:id` est aussi disponible et utilise le même format.
+La route `PUT /api/admin/users/:id` est aussi disponible et utilise le même format.
 La modification est partielle : on peut envoyer un seul champ ou plusieurs.
 
 ### Corps attendu
@@ -244,12 +244,12 @@ Les erreurs possibles sont les mêmes que pour la consultation :
 
 ## Supprimer un utilisateur
 
-### `DELETE /api/users/:id`
+### `DELETE /api/admin/users/:id`
 
 Exemple :
 
 ```text
-DELETE /api/users/1
+DELETE /api/admin/users/1
 ```
 
 Cette requête n'a pas de body.

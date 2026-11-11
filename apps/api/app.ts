@@ -2,8 +2,11 @@ import express from "express";
 import cors from "cors";
 import { syncModels } from "./models/index.model";
 import { PORT } from "./config/env";
-import userRouter from "./user.route";
-import authRouter from "./auth.route";
+import userRouter from "./routes/admin/user.route";
+import authRouter from "./routes/auth.route";
+import articleRouter from "./routes/article.route";
+import adminArticleRouter from "./routes/admin/article.route";
+import adminAuthRouter from "./routes/admin/auth.route";
 // import { PORT } from "./config/env";
 
 const app = express();
@@ -28,8 +31,11 @@ app.use(
 );
 
 // Déclarer les routes
-app.use("/api/users", userRouter);
+app.use("/api/admin/users", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/admin/auth", adminAuthRouter);
+app.use("/api/articles", articleRouter);
+app.use("/api/admin/articles", adminArticleRouter);
 
 app.listen(PORT, async (err) => {
     if (err) {

@@ -1,5 +1,10 @@
 import db from "../config/db";
 import User from "./user.model";
+import Post from "./post.model";
+
+// Définition des associations
+User.hasMany(Post, { foreignKey: "authorId", as: "posts" });
+Post.belongsTo(User, { foreignKey: "authorId", as: "author" });
 
 const syncModels = async () => {
     try {
@@ -11,4 +16,4 @@ const syncModels = async () => {
     }
 };
 
-export { User, syncModels };
+export { User, Post, syncModels };

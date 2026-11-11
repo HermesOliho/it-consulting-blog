@@ -113,7 +113,7 @@ Le mot de passe n'est jamais renvoyé dans la réponse.
 
 ## Se déconnecter
 
-### `POST /api/auth/logout`
+### `POST /api/admin/auth/logout`
 
 Le logout est actuellement **stateless**. Le serveur ne met pas le JWT sur une
 liste noire. Le front-end doit donc supprimer le token de son stockage local.

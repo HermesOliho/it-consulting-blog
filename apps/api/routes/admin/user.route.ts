@@ -5,13 +5,13 @@ import {
     getAllUsers,
     getUserById,
     updateUser,
-} from "./controllers/user.controller";
+} from "../../controllers/user.controller";
 import {
     validateCreateUser,
     validateUpdateUser,
     validateUserId,
-} from "./validators/user.validator";
-import { requireAuth } from "./middlewares/auth.middleware";
+} from "../../validators/user.validator";
+import { requireAuth } from "../../middlewares/auth.middleware";
 
 const userRouter = Router();
 
