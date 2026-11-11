@@ -1,111 +1,136 @@
+/* ============================================================
+   index.css : styles GLOBAUX, partagés par toute l'équipe.
+   Pour changer une couleur du site, on la modifie ICI.
+   ============================================================ */
+
+/* 1) Variables (design tokens) */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --color-bg: #f7f2ea;         /* fond crème de la page */
+  --color-surface: #fffdf9;    /* fond des cartes et champs */
+  --color-text: #2f2f22;       /* texte principal */
+  --color-text-soft: #6b6a58;  /* texte secondaire */
+  --color-border: #d9d3c4;     /* fines bordures */
+  --color-sage: #9f9b7e;       /* vert sauge (accents) */
+  --color-olive: #55532b;      /* olive foncé (boutons, footer) */
+  --color-olive-hover: #44421f;
+  --color-danger: #a33a2a;     /* messages d'erreur */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --font-serif: 'Lora', Georgia, serif;
+  --font-sans: 'Jost', system-ui, sans-serif;
+  --font-script: 'Allura', cursive;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --radius-pill: 999px;   /* boutons et champs "pilule" */
+  --radius-card: 8px;
+  --container-width: 1120px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+/* 2) Remise à zéro minimale */
+*, *::before, *::after {
+  box-sizing: border-box; /* la largeur inclut padding et bordures */
 }
 
 body {
   margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* Images toujours adaptées à la largeur de leur conteneur */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+/* 3) Typographie : clamp(min, idéal, max) adapte la taille à l'écran */
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.2;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+h1 { font-size: clamp(2rem, 5vw, 3.2rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.2rem); }
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
+/* Contour visible au clavier (accessibilité) */
+:focus-visible {
+  outline: 2px solid var(--color-olive);
+  outline-offset: 2px;
+}
+
+/* 4) Classes utilitaires réutilisables */
+
+/* Centre le contenu, avec 1rem de marge de chaque côté sur mobile */
+.container {
+  width: min(100% - 2rem, var(--container-width));
+  margin-inline: auto;
+}
+
+/* Espace vertical standard autour du contenu d'une page */
+.page {
+  padding-block: var(--space-xl);
+}
+
+/* Titre manuscrit, comme "featured posts" sur la référence */
+.script-title {
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+}
+
+/* Boutons */
+.btn {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn--primary {
+  background: var(--color-olive);
+  color: var(--color-bg);
+}
+.btn--primary:hover { background: var(--color-olive-hover); }
+.btn--ghost {
+  background: transparent;
+  color: var(--color-olive);
+  border-color: var(--color-olive);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Champs de formulaire */
+.input {
+  width: 100%;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+}
+.input:focus {
+  outline: 2px solid var(--color-sage);
+  border-color: transparent;
 }

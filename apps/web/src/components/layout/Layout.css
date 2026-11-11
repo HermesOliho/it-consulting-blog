@@ -1,0 +1,9 @@
+/* Footer collé en bas même quand la page est courte */
+.layout {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.layout__main {
+  flex: 1; /* le contenu prend tout l'espace restant */
+}

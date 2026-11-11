@@ -1,0 +1,68 @@
+.footer {
+  background: var(--color-olive);
+  color: var(--color-bg);
+}
+
+/* Mobile : 1 colonne. Dès 700px : 3 colonnes (la 1re plus large) */
+.footer__grid {
+  display: grid;
+  gap: var(--space-lg);
+  padding-block: var(--space-xl);
+}
+@media (min-width: 700px) {
+  .footer__grid {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+}
+
+.footer__logo {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-script);
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+.footer__tagline {
+  margin: 0;
+  max-width: 32ch;
+  opacity: 0.85;
+}
+
+/* Petits titres en majuscules espacées, comme le menu de la référence */
+.footer__title {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.footer ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.footer a {
+  text-decoration: none;
+  opacity: 0.85;
+}
+.footer a:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+/* Sur fond olive, le contour de focus doit être clair */
+.footer :focus-visible {
+  outline-color: var(--color-bg);
+}
+
+.footer__bottom {
+  padding-block: var(--space-md);
+  border-top: 1px solid rgba(247, 242, 234, 0.25);
+  font-size: 0.85rem;
+}
+.footer__bottom p {
+  margin: 0;
+  opacity: 0.8;
+}
