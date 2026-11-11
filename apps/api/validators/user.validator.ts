@@ -3,10 +3,7 @@ import { z } from "zod";
 
 const userFields = {
     name: z.string().trim().min(1, "Le nom est obligatoire."),
-    email: z
-        .string()
-        .trim()
-        .email("L'adresse email est invalide."),
+    email: z.string().trim().email("L'adresse email est invalide."),
     password: z.string().min(1, "Le mot de passe est obligatoire."),
 };
 
@@ -32,7 +29,7 @@ const validate =
         const result = schema.safeParse(req[source]);
 
         if (!result.success) {
-            return res.status(400).json({
+            return res.status(source === "body" ? 422 : 400).json({
                 success: false,
                 message: "Données de requête invalides.",
                 errors: result.error.issues.map((issue) => ({
