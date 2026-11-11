@@ -156,7 +156,7 @@ const response = await fetch("http://localhost:8080/api/auth/login", {
         "Content-Type": "application/json",
     },
     body: JSON.stringify({
-        email: "alice@example.com",
+        email: "yseult@example.com",
         password: "mon-mot-de-passe",
     }),
 });

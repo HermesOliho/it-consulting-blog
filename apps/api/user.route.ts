@@ -11,9 +11,11 @@ import {
     validateUpdateUser,
     validateUserId,
 } from "./validators/user.validator";
+import { requireAuth } from "./middlewares/auth.middleware";
 
 const userRouter = Router();
 
+userRouter.use(requireAuth);
 userRouter.get("/", getAllUsers);
 userRouter.post("/", validateCreateUser, createUser);
 userRouter.get("/:id", validateUserId, getUserById);
