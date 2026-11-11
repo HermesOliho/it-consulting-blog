@@ -3,6 +3,7 @@ import cors from "cors";
 import { syncModels } from "./models/index.model";
 import { PORT } from "./config/env";
 import userRouter from "./user.route";
+import authRouter from "./auth.route";
 // import { PORT } from "./config/env";
 
 const app = express();
@@ -28,6 +29,7 @@ app.use(
 
 // Déclarer les routes
 app.use("/api/users", userRouter);
+app.use("/api/auth", authRouter);
 
 app.listen(PORT, async (err) => {
     if (err) {

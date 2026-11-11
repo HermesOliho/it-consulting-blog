@@ -14,4 +14,5 @@ export const {
     EMAIL,
     EMAIL_PASSWORD,
     HOST_URL,
+    JWT_SECRET,
 } = process.env;
