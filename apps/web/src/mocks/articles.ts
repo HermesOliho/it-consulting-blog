@@ -30,3 +30,10 @@ export async function listCategories(): Promise<Category[]> {
   await delay(150)
   return categories
 }
+
+export async function getArticleById(id: number): Promise<Article> {
+  await delay()
+  const article = articles.find((item) => item.id === id && item.status === 'PUBLISHED')
+  if (!article) throw new Error('Article introuvable.')
+  return article
+}

@@ -9,7 +9,7 @@ interface ArticleCardProps {
 
 // Carte d'aperçu d'un article : image, catégorie, titre, résumé, auteur et date
 export default function ArticleCard({ article }: ArticleCardProps) {
-  const url = `/articles/${article.slug}`
+  const url = `/articles/${article.id}`
 
   return (
     <article className="article-card">

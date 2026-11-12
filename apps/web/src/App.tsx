@@ -10,6 +10,8 @@ import UsersPage from './pages/admin/users/UsersPage'
 import UserFormPage from './pages/admin/users/UserFormPage'
 import ArticlesAdminPage from './pages/admin/articles/ArticlesAdminPage'
 import ArticleEditorPage from './pages/admin/articles/ArticleEditorPage'
+import ArticlesPage from './pages/public/ArticlesPage'
+import ArticleDetailPage from './pages/public/ArticleDetailPage'
 
 export default function App() {
   return (
@@ -17,7 +19,8 @@ export default function App() {
       {/* ===== Espace PUBLIC (Header + Footer) ===== */}
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
-        {/* Les pages publiques des collègues (articles, détail...) s'ajoutent ici */}
+        <Route path="/articles" element={<ArticlesPage />} />
+        <Route path="/articles/:id" element={<ArticleDetailPage />} />
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

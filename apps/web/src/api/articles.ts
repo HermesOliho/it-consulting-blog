@@ -19,7 +19,32 @@ export async function listArticles(
   if (params.category) query.set('category', params.category)
   const qs = query.toString()
 
-  return http<Paginated<Article>>(`/articles${qs ? `?${qs}` : ''}`)
+  const response = await http<
+    Paginated<Article> | { success: boolean; data: Article[] }
+  >(`/articles${qs ? `?${qs}` : ''}`)
+
+  if ('total' in response) return response
+
+  return {
+    data: response.data,
+    total: response.data.length,
+    page: params.page ?? 1,
+    limit: params.limit ?? response.data.length,
+  }
+}
+
+// GET /api/articles/:id
+export async function getArticleById(id: number): Promise<Article> {
+  if (USE_MOCK) {
+    const mock = await import('../mocks/articles')
+    return mock.getArticleById(id)
+  }
+
+  const response = await http<Article | { success: boolean; data: Article }>(
+    `/articles/${id}`,
+  )
+
+  return 'data' in response ? response.data : response
 }
 
 // GET /api/categories
