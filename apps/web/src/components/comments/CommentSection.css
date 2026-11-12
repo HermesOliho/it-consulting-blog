@@ -1,0 +1,146 @@
+.comment-section {
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 0.75fr);
+  gap: clamp(2rem, 7vw, 5rem);
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.comment-section h2 {
+  margin: 0 0 1.5rem;
+}
+
+.comment-section__count {
+  color: var(--color-text-soft);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+}
+
+.comment-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comment {
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.comment__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.comment__heading time {
+  margin-left: auto;
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+}
+
+.comment > p,
+.comment-section__empty {
+  margin: 0.65rem 0 0;
+  color: var(--color-text-soft);
+}
+
+.comment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.comment-badge--admin {
+  background: #eee8f8;
+  color: #523382;
+}
+
+.comment-badge--agent {
+  background: #fbf0d7;
+  color: #76520c;
+}
+
+.comment-badge--visitor {
+  background: rgba(85, 83, 43, 0.1);
+  color: var(--color-olive);
+}
+
+.comment-form {
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+  padding: 1.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.comment-form-wrap__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+.comment-form > p {
+  margin: 0 0 0.5rem;
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+}
+
+.comment-form label {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.comment-form__textarea {
+  min-height: 130px;
+  resize: vertical;
+  border-radius: var(--radius-card);
+}
+
+.comment-form .btn {
+  justify-self: start;
+  gap: 0.5rem;
+}
+
+.comment-form__error {
+  margin: 0;
+  color: var(--color-danger);
+}
+
+.comment-form__notice {
+  margin: 0;
+  color: var(--color-olive);
+  font-size: 0.85rem;
+}
+
+.comment-signin {
+  padding: 1.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.comment-signin p {
+  margin: 0 0 1rem;
+  color: var(--color-text-soft);
+}
+
+@media (max-width: 700px) {
+  .comment-section {
+    grid-template-columns: 1fr;
+  }
+}

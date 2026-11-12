@@ -16,6 +16,7 @@ interface AdminLink {
 const ADMIN_LINKS: AdminLink[] = [
   { to: '/admin', label: 'Tableau de bord', end: true },
   { to: '/admin/articles', label: 'Articles' },
+  { to: '/admin/comments', label: 'Commentaires' },
   { to: '/admin/users', label: 'Utilisateurs', roles: ['SUPER_ADMIN'] },
 ]
 

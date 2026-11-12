@@ -1,13 +1,27 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FiArrowLeft } from 'react-icons/fi'
+import { useAuth } from '../../auth/useAuth'
 import { getArticleById } from '../../api/articles'
+import CommentSection from '../../components/comments/CommentSection'
 import { getErrorMessage } from '../../lib/http'
 import { formatDate } from '../../lib/format'
+import type { CommentIdentity } from '../../types/comments'
 import type { Article } from '../../types'
 import './ArticleDetailPage.css'
 
-export default function ArticleDetailPage() {
+interface ArticleDetailPageProps {
+  commentUser?: CommentIdentity | null
+}
+
+export default function ArticleDetailPage({ commentUser }: ArticleDetailPageProps) {
+  const { user } = useAuth()
+  const currentUser: CommentIdentity | null =
+    commentUser === undefined
+      ? user
+        ? { id: user.id, name: user.name, role: user.role, isAgent: false }
+        : null
+      : commentUser
   const { id } = useParams()
   const articleId = Number(id)
   const isValidId = Number.isInteger(articleId) && articleId > 0
@@ -105,6 +119,7 @@ export default function ArticleDetailPage() {
         ))}
       </div>
 
+      <CommentSection articleId={article.id} currentUser={currentUser} />
     </article>
   )
 }
