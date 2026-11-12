@@ -1,0 +1,5 @@
+.hero {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(159, 155, 126, 0.15), transparent 58%),
+    var(--color-bg);
+}
