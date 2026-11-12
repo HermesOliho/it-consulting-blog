@@ -8,6 +8,8 @@ import LoginPage from './pages/admin/LoginPage'
 import DashboardPage from './pages/admin/DashboardPage'
 import UsersPage from './pages/admin/users/UsersPage'
 import UserFormPage from './pages/admin/users/UserFormPage'
+import ArticlesAdminPage from './pages/admin/articles/ArticlesAdminPage'
+import ArticleEditorPage from './pages/admin/articles/ArticleEditorPage'
 
 export default function App() {
   return (
@@ -25,6 +27,11 @@ export default function App() {
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<DashboardPage />} />
 
+          {/* Articles : tout administrateur connecté */}
+          <Route path="/admin/articles" element={<ArticlesAdminPage />} />
+          <Route path="/admin/articles/new" element={<ArticleEditorPage />} />
+          <Route path="/admin/articles/:id/edit" element={<ArticleEditorPage />} />
+
           {/* Pages réservées au SUPER_ADMIN */}
           <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']} />}>
             <Route path="/admin/users" element={<UsersPage />} />
@@ -32,7 +39,7 @@ export default function App() {
             <Route path="/admin/users/:id/edit" element={<UserFormPage />} />
           </Route>
 
-          {/* Les routes admin de l'étape 5 et des collègues s'ajoutent ici */}
+          {/* Les routes des collègues (commentaires, profil...) s'ajoutent ici */}
         </Route>
       </Route>
     </Routes>
