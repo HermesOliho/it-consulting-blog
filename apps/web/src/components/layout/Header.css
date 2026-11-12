@@ -1,0 +1,68 @@
+.header {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+.header__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-md);
+}
+.header__logo {
+  font-family: var(--font-script);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-olive);
+  text-decoration: none;
+}
+
+/* Mobile : le menu est caché, le bouton l'ouvre */
+.header__toggle {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.header__nav {
+  display: none;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  padding-bottom: var(--space-sm);
+}
+.header__nav--open {
+  display: flex;
+}
+.header__nav a {
+  padding-block: 0.35rem;
+  border-bottom: 2px solid transparent;
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.header__nav a.active {
+  border-bottom-color: var(--color-olive);
+}
+
+/* Dès 700px : menu toujours visible, en ligne, sans bouton */
+@media (min-width: 700px) {
+  .header__toggle {
+    display: none;
+  }
+  .header__nav {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-lg);
+    width: auto;
+    padding-bottom: 0;
+  }
+}

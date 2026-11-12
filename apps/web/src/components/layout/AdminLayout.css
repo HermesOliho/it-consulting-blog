@@ -1,0 +1,106 @@
+/* Mobile : le menu est en haut, le contenu dessous */
+.admin {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+.admin__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-olive);
+  color: var(--color-bg);
+}
+.admin__brand {
+  font-family: var(--font-script);
+  font-size: 1.9rem;
+  line-height: 1;
+  text-decoration: none;
+}
+
+/* Liens du menu : défilent horizontalement si l'écran est étroit */
+.admin__nav {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+}
+.admin__nav a {
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.9rem;
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+.admin__nav a:hover {
+  background: rgba(247, 242, 234, 0.12);
+  opacity: 1;
+}
+.admin__nav a.active {
+  background: var(--color-bg);
+  color: var(--color-olive);
+  opacity: 1;
+}
+
+.admin__user {
+  font-size: 0.9rem;
+}
+.admin__name {
+  margin: 0;
+  font-weight: 500;
+}
+.admin__role {
+  margin: 0 0 var(--space-sm);
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.admin__site {
+  display: block;
+  margin-bottom: var(--space-sm);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.admin__logout {
+  padding: 0.5rem 1.1rem;
+  border-color: rgba(247, 242, 234, 0.6);
+  color: var(--color-bg);
+}
+.admin__logout:hover {
+  background: rgba(247, 242, 234, 0.12);
+}
+/* Sur fond olive, le contour de focus doit être clair */
+.admin__side :focus-visible {
+  outline-color: var(--color-bg);
+}
+
+.admin__main {
+  flex: 1;
+  min-width: 0; /* permet aux tableaux larges de défiler au lieu de déborder */
+  padding: var(--space-lg) var(--space-md);
+}
+
+/* Dès 900px : menu fixe à gauche */
+@media (min-width: 900px) {
+  .admin {
+    flex-direction: row;
+  }
+  .admin__side {
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+    width: 250px;
+    height: 100dvh;
+    padding: var(--space-lg) var(--space-md);
+  }
+  .admin__nav {
+    flex-direction: column;
+    overflow: visible;
+  }
+  .admin__user {
+    margin-top: auto; /* colle le bloc utilisateur en bas du menu */
+  }
+  .admin__main {
+    padding: var(--space-xl) var(--space-lg);
+  }
+}
