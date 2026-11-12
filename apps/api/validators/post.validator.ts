@@ -14,7 +14,12 @@ const postFields = {
     content: z.string().trim().min(1, "Le contenu est obligatoire."),
 };
 
-export const createPostSchema = z.object(postFields).strict();
+export const createPostSchema = z
+    .object({
+        ...postFields,
+        slug: postFields.slug.optional(),
+    })
+    .strict();
 
 export const updatePostSchema = z
     .object(postFields)

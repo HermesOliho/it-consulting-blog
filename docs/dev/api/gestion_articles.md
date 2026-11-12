@@ -36,7 +36,9 @@ Content-Type: application/json
 ```
 
 Le champ `slug` doit contenir seulement des lettres minuscules, des chiffres et
-des tirets. Exemple : `mon-premier-article`.
+des tirets. Exemple : `mon-premier-article`. Lors de la création, il peut être
+omis : l'API le génère automatiquement à partir du titre. Si le slug généré
+existe déjà, un suffixe numérique lui est ajouté.
 
 ## Consultation publique
 
@@ -109,13 +111,13 @@ Le body attendu est :
 ```json
 {
   "title": "Comprendre les sauvegardes",
-  "slug": "comprendre-les-sauvegardes",
   "content": "Le contenu de l'article..."
 }
 ```
 
-`authorId` ne doit pas être envoyé. Il est pris depuis le JWT de l'utilisateur
-connecté.
+Le champ `slug` est facultatif. Lorsqu'il est absent, il est généré à partir du
+`title` (par exemple `comprendre-les-sauvegardes`). `authorId` ne doit pas être
+envoyé. Il est pris depuis le JWT de l'utilisateur connecté.
 
 Réponse : `201 Created`, avec l'article créé dans `data`.
 

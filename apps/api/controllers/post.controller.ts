@@ -26,6 +26,27 @@ const postQueryOptions = {
 const getPostId = (id: string | string[]) =>
     isValidId(id) ? Number(id) : null;
 
+const slugify = (title: string) =>
+    title
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "article";
+
+const getAvailableSlug = async (title: string) => {
+    const baseSlug = slugify(title);
+    let slug = baseSlug;
+    let suffix = 2;
+
+    while (await Post.findOne({ where: { slug } })) {
+        slug = `${baseSlug}-${suffix}`;
+        suffix += 1;
+    }
+
+    return slug;
+};
+
 export const getAllPosts = async (req: Request, res: Response) => {
     try {
         const posts = await Post.findAll({
@@ -84,7 +105,8 @@ export const createPost = async (req: Request, res: Response) => {
             });
         }
 
-        const { title, slug, content } = req.body;
+        const { title, content } = req.body;
+        const slug = req.body.slug ?? (await getAvailableSlug(title));
         const existingPost = await Post.findOne({ where: { slug } });
 
         if (existingPost) {
