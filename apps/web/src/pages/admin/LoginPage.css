@@ -1,0 +1,19 @@
+/* Carte de connexion centrée, largeur limitée */
+.login {
+  max-width: 440px;
+  margin-inline: auto;
+}
+.login h1 {
+  margin: 0 0 var(--space-sm);
+  text-align: center;
+  font-size: clamp(1.6rem, 5vw, 2rem);
+}
+.login__intro {
+  margin: 0 0 var(--space-lg);
+  text-align: center;
+  color: var(--color-text-soft);
+}
+/* Bouton pleine largeur */
+.login .btn {
+  width: 100%;
+}

@@ -1,0 +1,62 @@
+/* Styles partagés : formulaires, cartes et messages */
+
+.card {
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: var(--space-md);
+}
+.field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.field__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--color-text-soft);
+}
+.field__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-danger);
+}
+
+/* Champ en erreur : bordure rouge */
+.input[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+/* Zone de texte (coins moins arrondis que les champs "pilule") */
+.textarea {
+  width: 100%;
+  min-height: 7rem;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+.textarea:focus {
+  outline: 2px solid var(--color-sage);
+  border-color: transparent;
+}
+
+/* Message d'erreur global d'un formulaire ou d'une action */
+.alert {
+  margin: 0 0 var(--space-md);
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-card);
+  background: #fff5f3;
+  color: var(--color-danger);
+}
