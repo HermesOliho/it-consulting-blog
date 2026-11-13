@@ -90,6 +90,18 @@ Si l'article n'existe pas, l'API renvoie `404 Not Found` :
 }
 ```
 
+## Commentaires d'un article
+
+Les commentaires sont gérés par des routes dédiées :
+
+- `GET /api/articles/:postId/comments` pour lister les commentaires approuvés ;
+- `POST /api/articles/:postId/comments` pour publier un commentaire visiteur ;
+- `POST /api/admin/articles/:postId/comments` pour commenter en tant que membre
+  authentifié.
+
+La modération se fait via `/api/admin/comments`. Voir la documentation complète :
+[Gestion des commentaires](./gestion_commentaires.md).
+
 ## Gestion authentifiée
 
 Toutes les routes suivantes commencent par `/api/admin` et demandent un JWT

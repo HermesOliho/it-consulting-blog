@@ -29,10 +29,10 @@ Content-Type: application/json
 
 L'API gère uniquement deux rôles :
 
-| Rôle          | Gérer les articles | Lister / consulter les utilisateurs | Créer / modifier / supprimer un utilisateur |
-| ------------- | ------------------ | ----------------------------------- | ------------------------------------------- |
-| `super_admin` | Oui                | Oui                                 | Oui                                         |
-| `admin`       | Oui                | Oui                                 | Non                                         |
+| Rôle          | Gérer les articles | Modérer les commentaires | Lister / consulter les utilisateurs | Créer / modifier / supprimer un utilisateur |
+| ------------- | ------------------ | ------------------------ | ----------------------------------- | ------------------------------------------- |
+| `super_admin` | Oui                | Oui                      | Oui                                 | Oui                                         |
+| `admin`       | Oui                | Oui                      | Oui                                 | Non                                         |
 
 Le rôle est relu en base à chaque requête protégée. Un changement de rôle prend
 donc effet immédiatement, sans attendre l'expiration du JWT.
@@ -55,7 +55,12 @@ faut la faire évoluer. Exemple avec MySQL, en conservant temporairement
 l'ancienne valeur pour convertir les données :
 
 ```sql
-ALTER TABLE users MODIFY role ENUM('super_admin', 'admin', 'editor') NOT NULL DEFAULT 'admin';
+-- Si la colonne role n'existe pas encore :
+ALTER TABLE users ADD COLUMN role ENUM('super_admin', 'admin', 'editor') NOT NULL DEFAULT 'admin';
+
+-- Si elle existe déjà, remplacer la ligne précédente par :
+-- ALTER TABLE users MODIFY role ENUM('super_admin', 'admin', 'editor') NOT NULL DEFAULT 'admin';
+
 UPDATE users SET role = 'admin' WHERE role = 'editor';
 ALTER TABLE users MODIFY role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin';
 ```

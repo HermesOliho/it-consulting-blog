@@ -84,8 +84,8 @@ L'API gère uniquement deux rôles :
 
 - `super_admin` : toutes les permissions, y compris la création, la modification
   et la suppression des utilisateurs ;
-- `admin` : gestion complète des articles, mais aucune création, modification ou
-  suppression d'utilisateur.
+- `admin` : gestion complète des articles et modération des commentaires, mais
+  aucune création, modification ou suppression d'utilisateur.
 
 Le rôle est renvoyé dans `data.user.role` et inclus dans le JWT. Il est aussi
 relu en base à chaque requête protégée : un changement de rôle prend donc effet
