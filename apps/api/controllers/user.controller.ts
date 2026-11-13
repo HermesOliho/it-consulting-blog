@@ -3,7 +3,16 @@ import { Request, Response } from "express";
 import { User } from "../models/index.model";
 import { isValidId } from "../utils";
 
-const userAttributes = ["id", "name", "email", "createdAt", "updatedAt"];
+const userAttributes = [
+    "id",
+    "name",
+    "email",
+    "role",
+    "createdAt",
+    "updatedAt",
+];
+
+type UserRole = "super_admin" | "admin";
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
@@ -66,7 +75,7 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
 
         const existingUser = await User.findOne({
             where: { email: email.trim() },
@@ -86,6 +95,7 @@ export const createUser = async (req: Request, res: Response) => {
             name: name.trim(),
             email: email.trim(),
             password: hashedPassword,
+            role: (role as UserRole | undefined) ?? "admin",
         });
 
         return res.status(201).json({
@@ -106,7 +116,7 @@ export const createUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
 
         if (!isValidId(id)) {
             return res.status(400).json({
@@ -141,10 +151,12 @@ export const updateUser = async (req: Request, res: Response) => {
             name?: string;
             email?: string;
             password?: string;
+            role?: UserRole;
         } = {};
 
         if (name !== undefined) updates.name = name.trim();
         if (email !== undefined) updates.email = email.trim();
+        if (role !== undefined) updates.role = role as UserRole;
         if (password !== undefined) {
             updates.password = await argon2.hash(password, {
                 type: argon2.argon2id,

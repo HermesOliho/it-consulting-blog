@@ -11,16 +11,37 @@ import {
     validateUpdateUser,
     validateUserId,
 } from "../../validators/user.validator";
-import { requireAuth } from "../../middlewares/auth.middleware";
+import { requireAuth, requireRole } from "../../middlewares/auth.middleware";
 
 const userRouter = Router();
 
-userRouter.use(requireAuth);
+// Lecture : accessible à tous les utilisateurs authentifiés ayant un rôle
+// connu. Écriture : réservée au super administrateur.
+userRouter.use(requireAuth, requireRole("super_admin", "admin"));
 userRouter.get("/", getAllUsers);
-userRouter.post("/", validateCreateUser, createUser);
 userRouter.get("/:id", validateUserId, getUserById);
-userRouter.patch("/:id", validateUserId, validateUpdateUser, updateUser);
-userRouter.put("/:id", validateUserId, validateUpdateUser, updateUser);
-userRouter.delete("/:id", validateUserId, deleteUser);
+
+// Écriture : réservée au super administrateur.
+userRouter.post("/", requireRole("super_admin"), validateCreateUser, createUser);
+userRouter.patch(
+    "/:id",
+    requireRole("super_admin"),
+    validateUserId,
+    validateUpdateUser,
+    updateUser,
+);
+userRouter.put(
+    "/:id",
+    requireRole("super_admin"),
+    validateUserId,
+    validateUpdateUser,
+    updateUser,
+);
+userRouter.delete(
+    "/:id",
+    requireRole("super_admin"),
+    validateUserId,
+    deleteUser,
+);
 
 export default userRouter;

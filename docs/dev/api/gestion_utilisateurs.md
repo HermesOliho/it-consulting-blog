@@ -25,6 +25,47 @@ Toutes les requêtes avec un corps utilisent :
 Content-Type: application/json
 ```
 
+## Rôles et permissions
+
+L'API gère uniquement deux rôles :
+
+| Rôle          | Gérer les articles | Lister / consulter les utilisateurs | Créer / modifier / supprimer un utilisateur |
+| ------------- | ------------------ | ----------------------------------- | ------------------------------------------- |
+| `super_admin` | Oui                | Oui                                 | Oui                                         |
+| `admin`       | Oui                | Oui                                 | Non                                         |
+
+Le rôle est relu en base à chaque requête protégée. Un changement de rôle prend
+donc effet immédiatement, sans attendre l'expiration du JWT.
+
+Lorsqu'un utilisateur `admin` tente une opération d'écriture sur un utilisateur,
+l'API renvoie `403 Forbidden` :
+
+```json
+{
+    "success": false,
+    "message": "Accès refusé. Permissions insuffisantes."
+}
+```
+
+### Migration d'une base existante
+
+Le modèle utilise maintenant l'énumération `ENUM('super_admin', 'admin')`. Si la
+table `users` existe déjà avec l'ancienne énumération (`admin`, `editor`), il
+faut la faire évoluer. Exemple avec MySQL, en conservant temporairement
+l'ancienne valeur pour convertir les données :
+
+```sql
+ALTER TABLE users MODIFY role ENUM('super_admin', 'admin', 'editor') NOT NULL DEFAULT 'admin';
+UPDATE users SET role = 'admin' WHERE role = 'editor';
+ALTER TABLE users MODIFY role ENUM('super_admin', 'admin') NOT NULL DEFAULT 'admin';
+```
+
+Après la migration, pense à promouvoir au moins un compte en `super_admin` :
+
+```sql
+UPDATE users SET role = 'super_admin' WHERE id = 1;
+```
+
 ## Format d'un utilisateur
 
 L'API renvoie un utilisateur avec ces champs :
@@ -34,6 +75,7 @@ L'API renvoie un utilisateur avec ces champs :
     "id": 1,
     "name": "Yseult",
     "email": "yseult@example.com",
+    "role": "admin",
     "createdAt": "2026-11-11T20:00:00.000Z",
     "updatedAt": "2026-11-11T20:00:00.000Z"
 }
@@ -58,6 +100,7 @@ Code HTTP : `200 OK`
             "id": 1,
             "name": "Yseult",
             "email": "yseult@example.com",
+            "role": "admin",
             "createdAt": "2026-11-11T20:00:00.000Z",
             "updatedAt": "2026-11-11T20:00:00.000Z"
         }
@@ -88,6 +131,7 @@ Code HTTP : `200 OK`
         "id": 1,
         "name": "Yseult",
         "email": "yseult@example.com",
+        "role": "admin",
         "createdAt": "2026-11-11T20:00:00.000Z",
         "updatedAt": "2026-11-11T20:00:00.000Z"
     }
@@ -134,7 +178,8 @@ Utilisateur absent — `404 Not Found` :
 {
     "name": "Yseult",
     "email": "yseult@example.com",
-    "password": "mon-mot-de-passe"
+    "password": "mon-mot-de-passe",
+    "role": "admin"
 }
 ```
 
@@ -143,9 +188,13 @@ Règles :
 - `name` est obligatoire et ne doit pas être vide ;
 - `email` est obligatoire et doit être valide ;
 - `password` est obligatoire et ne doit pas être vide ;
+- `role` est facultatif et vaut `admin` par défaut. Les valeurs acceptées sont
+  uniquement `super_admin` et `admin` ;
 - les champs supplémentaires sont refusés ;
 - les espaces autour de `name` et `email` sont retirés ;
 - le mot de passe n'est pas conservé en clair.
+
+Seul un utilisateur `super_admin` peut appeler cette route.
 
 ### Réponse
 
@@ -158,6 +207,7 @@ Code HTTP : `201 Created`
         "id": 1,
         "name": "Yseult",
         "email": "yseult@example.com",
+        "role": "admin",
         "createdAt": "2026-11-11T20:00:00.000Z",
         "updatedAt": "2026-11-11T20:00:00.000Z"
     }
@@ -211,12 +261,16 @@ Exemple avec plusieurs champs :
 {
     "name": "Yseult",
     "email": "yseult@example.com",
-    "password": "nouveau-mot-de-passe"
+    "password": "nouveau-mot-de-passe",
+    "role": "super_admin"
 }
 ```
 
-Au moins un champ doit être envoyé. Les champs possibles sont `name`, `email`
-et `password`. Les champs supplémentaires sont refusés.
+Au moins un champ doit être envoyé. Les champs possibles sont `name`, `email`,
+`password` et `role`. Les valeurs acceptées pour `role` sont uniquement
+`super_admin` et `admin`. Les champs supplémentaires sont refusés.
+
+Seul un utilisateur `super_admin` peut appeler cette route.
 
 ### Réponse
 
@@ -229,6 +283,7 @@ Code HTTP : `200 OK`
         "id": 1,
         "name": "Yseult",
         "email": "yseult@example.com",
+        "role": "admin",
         "createdAt": "2026-11-11T20:00:00.000Z",
         "updatedAt": "2026-11-11T20:15:00.000Z"
     }
@@ -238,6 +293,7 @@ Code HTTP : `200 OK`
 Les erreurs possibles sont les mêmes que pour la consultation :
 
 - `400` ou `422` si l'identifiant ou le body est invalide ;
+- `403` si l'utilisateur connecté n'est pas `super_admin` ;
 - `404` si l'utilisateur n'existe pas ;
 - `409` si le nouvel email est déjà utilisé ;
 - `500` en cas de problème serveur.
@@ -252,7 +308,8 @@ Exemple :
 DELETE /api/admin/users/1
 ```
 
-Cette requête n'a pas de body.
+Cette requête n'a pas de body. Seul un utilisateur `super_admin` peut appeler
+cette route ; un `admin` reçoit `403 Forbidden`.
 
 ### Réponse
 

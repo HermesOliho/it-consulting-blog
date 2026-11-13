@@ -93,7 +93,16 @@ Si l'article n'existe pas, l'API renvoie `404 Not Found` :
 ## Gestion authentifiée
 
 Toutes les routes suivantes commencent par `/api/admin` et demandent un JWT
-valide.
+valide. Elles sont accessibles aux deux rôles `super_admin` et `admin` : les
+deux peuvent créer, modifier et supprimer des articles. Un utilisateur sans
+rôle connu reçoit `403 Forbidden` :
+
+```json
+{
+  "success": false,
+  "message": "Accès refusé. Permissions insuffisantes."
+}
+```
 
 ### Lister les articles — `GET /api/admin/articles`
 

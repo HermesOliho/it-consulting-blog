@@ -5,9 +5,17 @@ const userFields = {
     name: z.string().trim().min(1, "Le nom est obligatoire."),
     email: z.string().trim().email("L'adresse email est invalide."),
     password: z.string().min(1, "Le mot de passe est obligatoire."),
+    role: z.enum(["super_admin", "admin"], {
+        message: "Le rôle doit être super_admin ou admin.",
+    }),
 };
 
-export const createUserSchema = z.object(userFields).strict();
+export const createUserSchema = z
+    .object({
+        ...userFields,
+        role: userFields.role.optional(),
+    })
+    .strict();
 
 export const updateUserSchema = z
     .object(userFields)

@@ -57,6 +57,7 @@ Code HTTP : `200 OK`
             "id": 1,
             "name": "Yseult",
             "email": "yseult@gmail.com",
+            "role": "super_admin",
             "createdAt": "2026-11-11T20:00:00.000Z",
             "updatedAt": "2026-11-11T20:00:00.000Z"
         },
@@ -67,14 +68,28 @@ Code HTTP : `200 OK`
 }
 ```
 
-Le token expire après `3600` secondes, soit une heure. Le front-end doit le
-conserver avec soin, puis l'envoyer sur les routes protégées :
+Le token expire après `3600` secondes, soit une heure. Il contient l'identifiant
+de l'utilisateur, son email et son rôle. Le front-end doit le conserver avec
+soin, puis l'envoyer sur les routes protégées :
 
 ```http
 Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 ```
 
 Le mot de passe n'est jamais renvoyé dans la réponse.
+
+### Rôles
+
+L'API gère uniquement deux rôles :
+
+- `super_admin` : toutes les permissions, y compris la création, la modification
+  et la suppression des utilisateurs ;
+- `admin` : gestion complète des articles, mais aucune création, modification ou
+  suppression d'utilisateur.
+
+Le rôle est renvoyé dans `data.user.role` et inclus dans le JWT. Il est aussi
+relu en base à chaque requête protégée : un changement de rôle prend donc effet
+immédiatement, sans attendre l'expiration du token.
 
 ### Erreurs possibles
 

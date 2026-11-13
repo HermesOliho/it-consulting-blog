@@ -12,7 +12,7 @@ if (!jwtSecret) {
     );
 }
 
-const userAttributes = ["id", "name", "email"];
+const userAttributes = ["id", "name", "email", "role"];
 
 export const login = async (req: Request, res: Response) => {
     try {
@@ -33,6 +33,7 @@ export const login = async (req: Request, res: Response) => {
             {
                 sub: userId,
                 email: user.get("email"),
+                role: user.get("role"),
             },
             jwtSecret,
             {

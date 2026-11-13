@@ -6,7 +6,7 @@ import {
     getPostById,
     updatePost,
 } from "../../controllers/post.controller";
-import { requireAuth } from "../../middlewares/auth.middleware";
+import { requireAuth, requireRole } from "../../middlewares/auth.middleware";
 import {
     validateCreatePost,
     validatePostId,
@@ -15,7 +15,8 @@ import {
 
 const adminArticleRouter = Router();
 
-adminArticleRouter.use(requireAuth);
+// Gestion des articles : super_admin et admin.
+adminArticleRouter.use(requireAuth, requireRole("super_admin", "admin"));
 adminArticleRouter.get("/", getAllPosts);
 adminArticleRouter.post("/", validateCreatePost, createPost);
 adminArticleRouter.get("/:id", validatePostId, getPostById);
