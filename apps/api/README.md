@@ -30,3 +30,29 @@ passer sans erreur avant chaque livraison.
   renvoient pas directement les instances de modèles.
 
 Les dates des DTO sont des chaînes ISO, conformes au JSON réellement renvoyé.
+
+## Créer le premier super administrateur
+
+Depuis la racine du projet :
+
+```bash
+./scripts/create-super-admin.sh
+```
+
+Sous Windows :
+
+```cmd
+scripts\create-super-admin.cmd
+```
+
+Le script demande le nom, l'email et le mot de passe. Il est possible de fournir
+ces informations via les variables `SUPER_ADMIN_NAME`, `SUPER_ADMIN_EMAIL` et
+`SUPER_ADMIN_PASSWORD` pour une utilisation non interactive.
+
+Pour promouvoir un utilisateur existant dont l'email est déjà utilisé :
+
+```bash
+./scripts/create-super-admin.sh --promote-existing
+```
+
+Le mot de passe est haché avec Argon2id et n'est jamais affiché.

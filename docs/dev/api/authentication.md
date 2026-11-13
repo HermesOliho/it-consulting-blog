@@ -188,3 +188,44 @@ Pour se déconnecter :
 ```js
 localStorage.removeItem("token");
 ```
+
+## Initialiser le premier super administrateur
+
+Sur un nouvel environnement, la création du premier compte `super_admin` se fait
+via un script dédié, depuis la racine du projet.
+
+Sous Linux ou macOS :
+
+```bash
+./scripts/create-super-admin.sh
+```
+
+Sous Windows :
+
+```cmd
+scripts\create-super-admin.cmd
+```
+
+Le script demande le nom, l'email et le mot de passe avec une saisie masquée. Il
+vérifie ensuite les données, hache le mot de passe avec Argon2id et crée le
+compte avec le rôle `super_admin`.
+
+Pour une utilisation non interactive :
+
+```bash
+SUPER_ADMIN_NAME="Hermès" \
+SUPER_ADMIN_EMAIL="admin@example.com" \
+SUPER_ADMIN_PASSWORD="mot-de-passe-solide" \
+./scripts/create-super-admin.sh
+```
+
+Le mot de passe doit contenir au moins 8 caractères. Il n'est jamais affiché
+dans la sortie du script.
+
+Si un utilisateur existe déjà avec l'email fourni mais n'est pas `super_admin`,
+le script s'arrête pour éviter une modification accidentelle. Pour le promouvoir
+explicitement :
+
+```bash
+./scripts/create-super-admin.sh --promote-existing
+```

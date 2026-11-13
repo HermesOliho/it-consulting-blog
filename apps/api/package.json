@@ -6,7 +6,8 @@
     "scripts": {
         "test": "echo \"Error: pas de test pour le moment\" && exit 1",
         "dev": "tsx watch app.ts",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "create-super-admin": "tsx scripts/create-super-admin.ts"
     },
     "keywords": [],
     "author": "Hermès Oliho",
