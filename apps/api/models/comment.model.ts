@@ -1,8 +1,35 @@
-import { DataTypes } from "sequelize";
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute,
+} from "sequelize";
 import db from "../config/db";
+import type User from "./user.model";
 
-const Comment = db.define(
-    "Comment",
+export type CommentAuthorType = "member" | "visitor";
+
+class Comment extends Model<
+    InferAttributes<Comment, { omit: "createdAt" | "updatedAt" }>,
+    InferCreationAttributes<Comment, { omit: "createdAt" | "updatedAt" }>
+> {
+    declare id: CreationOptional<number>;
+    declare postId: number;
+    declare authorId: number | null;
+    declare authorType: CommentAuthorType;
+    declare name: string;
+    declare email: string | null;
+    declare content: string;
+    declare approved: CreationOptional<boolean>;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+
+    declare author?: NonAttribute<User | null>;
+}
+
+Comment.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -43,6 +70,7 @@ const Comment = db.define(
         },
     },
     {
+        sequelize: db,
         tableName: "comments",
     },
 );

@@ -121,7 +121,7 @@ export const createPost = async (req: Request, res: Response) => {
         return res.status(201).json({
             success: true,
             data: await Post.findByPk(
-                Number(post.get("id")),
+                post.id,
                 postQueryOptions,
             ),
         });
@@ -156,7 +156,7 @@ export const updatePost = async (req: Request, res: Response) => {
 
         const { title, slug, content } = req.body;
 
-        if (slug !== undefined && slug !== post.get("slug")) {
+        if (slug !== undefined && slug !== post.slug) {
             const existingPost = await Post.findOne({ where: { slug } });
 
             if (existingPost) {

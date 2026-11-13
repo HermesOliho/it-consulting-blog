@@ -1,8 +1,28 @@
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+} from "sequelize";
 import db from "../config/db";
-import { DataTypes } from "sequelize";
 
-const User = db.define(
-    "User",
+export type UserRole = "super_admin" | "admin";
+
+class User extends Model<
+    InferAttributes<User, { omit: "createdAt" | "updatedAt" }>,
+    InferCreationAttributes<User, { omit: "createdAt" | "updatedAt" }>
+> {
+    declare id: CreationOptional<number>;
+    declare name: string;
+    declare email: string;
+    declare password: string;
+    declare role: CreationOptional<UserRole>;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+}
+
+User.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -32,6 +52,7 @@ const User = db.define(
         },
     },
     {
+        sequelize: db,
         tableName: "users",
     },
 );

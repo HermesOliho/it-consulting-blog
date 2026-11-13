@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import { Request, Response } from "express";
 import { User } from "../models/index.model";
 import { isValidId } from "../utils";
+import type { UserRole } from "../models/user.model";
 
 const userAttributes = [
     "id",
@@ -11,8 +12,6 @@ const userAttributes = [
     "createdAt",
     "updatedAt",
 ];
-
-type UserRole = "super_admin" | "admin";
 
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
@@ -95,12 +94,12 @@ export const createUser = async (req: Request, res: Response) => {
             name: name.trim(),
             email: email.trim(),
             password: hashedPassword,
-            role: (role as UserRole | undefined) ?? "admin",
+            role: role ?? "admin",
         });
 
         return res.status(201).json({
             success: true,
-            data: await User.findByPk(user.get("id"), {
+            data: await User.findByPk(user.id, {
                 attributes: userAttributes,
             }),
         });
@@ -134,7 +133,7 @@ export const updateUser = async (req: Request, res: Response) => {
             });
         }
 
-        if (email !== undefined && email.trim() !== user.get("email")) {
+        if (email !== undefined && email.trim() !== user.email) {
             const existingUser = await User.findOne({
                 where: { email: email.trim() },
             });
@@ -156,7 +155,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
         if (name !== undefined) updates.name = name.trim();
         if (email !== undefined) updates.email = email.trim();
-        if (role !== undefined) updates.role = role as UserRole;
+        if (role !== undefined) updates.role = role;
         if (password !== undefined) {
             updates.password = await argon2.hash(password, {
                 type: argon2.argon2id,

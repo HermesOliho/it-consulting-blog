@@ -12,47 +12,48 @@ const commentQueryOptions = {
     ],
 };
 
-const getAuthor = (comment: any) => comment.get("author") ?? null;
+const getAuthor = (comment: Comment): User | null =>
+    comment.author ?? null;
 
-const formatPublicComment = (comment: any) => {
+const formatPublicComment = (comment: Comment) => {
     const author = getAuthor(comment);
 
     return {
-        id: comment.get("id"),
-        postId: comment.get("postId"),
-        content: comment.get("content"),
-        authorType: comment.get("authorType"),
-        name: comment.get("name"),
+        id: comment.id,
+        postId: comment.postId,
+        content: comment.content,
+        authorType: comment.authorType,
+        name: comment.name,
         author: author
             ? {
-                  id: author.get("id"),
-                  name: author.get("name"),
+                  id: author.id,
+                  name: author.name,
               }
             : null,
-        createdAt: comment.get("createdAt"),
+        createdAt: comment.createdAt,
     };
 };
 
-const formatAdminComment = (comment: any) => {
+const formatAdminComment = (comment: Comment) => {
     const author = getAuthor(comment);
 
     return {
-        id: comment.get("id"),
-        postId: comment.get("postId"),
-        content: comment.get("content"),
-        approved: comment.get("approved"),
-        authorType: comment.get("authorType"),
-        name: comment.get("name"),
-        email: author ? author.get("email") : comment.get("email"),
+        id: comment.id,
+        postId: comment.postId,
+        content: comment.content,
+        approved: comment.approved,
+        authorType: comment.authorType,
+        name: comment.name,
+        email: author ? author.email : comment.email,
         author: author
             ? {
-                  id: author.get("id"),
-                  name: author.get("name"),
-                  email: author.get("email"),
+                  id: author.id,
+                  name: author.name,
+                  email: author.email,
               }
             : null,
-        createdAt: comment.get("createdAt"),
-        updatedAt: comment.get("updatedAt"),
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
     };
 };
 
@@ -218,11 +219,18 @@ export const updateCommentApproval = async (req: Request, res: Response) => {
 
         await comment.update({ approved: req.body.approved });
 
+        const updatedComment = await findCommentWithAuthor(commentId);
+
+        if (!updatedComment) {
+            return res.status(404).json({
+                success: false,
+                message: "Commentaire non trouvé !",
+            });
+        }
+
         return res.status(200).json({
             success: true,
-            data: formatAdminComment(
-                await findCommentWithAuthor(commentId),
-            ),
+            data: formatAdminComment(updatedComment),
         });
     } catch (error) {
         console.error(
@@ -287,21 +295,26 @@ export const createMemberComment = async (req: Request, res: Response) => {
 
         const comment = await Comment.create({
             postId,
-            authorId: user.get("id") as number,
+            authorId: user.id,
             authorType: "member",
-            name: user.get("name") as string,
+            name: user.name,
             email: null,
             content: req.body.content,
             approved: true,
         });
 
+        const createdComment = await findCommentWithAuthor(comment.id);
+
+        if (!createdComment) {
+            return res.status(500).json({
+                success: false,
+                message: "Erreur serveur !",
+            });
+        }
+
         return res.status(201).json({
             success: true,
-            data: formatAdminComment(
-                await findCommentWithAuthor(
-                    Number(comment.get("id") as number),
-                ),
-            ),
+            data: formatAdminComment(createdComment),
         });
     } catch (error) {
         console.error(

@@ -21,19 +21,19 @@ export const login = async (req: Request, res: Response) => {
             where: { email },
         });
 
-        if (!user || !(await argon2.verify(user.get("password"), password))) {
+        if (!user || !(await argon2.verify(user.password, password))) {
             return res.status(401).json({
                 success: false,
                 message: "Email ou mot de passe incorrect.",
             });
         }
 
-        const userId = String(user.get("id"));
+        const userId = String(user.id);
         const token = jwt.sign(
             {
                 sub: userId,
-                email: user.get("email"),
-                role: user.get("role"),
+                email: user.email,
+                role: user.role,
             },
             jwtSecret,
             {
@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response) => {
             },
         );
 
-        const safeUser = await User.findByPk(user.get("id"), {
+        const safeUser = await User.findByPk(user.id, {
             attributes: userAttributes,
         });
 

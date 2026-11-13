@@ -1,8 +1,26 @@
-import { DataTypes } from "sequelize";
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+} from "sequelize";
 import db from "../config/db";
 
-const Post = db.define(
-    "Post",
+class Post extends Model<
+    InferAttributes<Post, { omit: "createdAt" | "updatedAt" }>,
+    InferCreationAttributes<Post, { omit: "createdAt" | "updatedAt" }>
+> {
+    declare id: CreationOptional<number>;
+    declare title: string;
+    declare slug: string;
+    declare content: string;
+    declare authorId: number;
+    declare createdAt: CreationOptional<Date>;
+    declare updatedAt: CreationOptional<Date>;
+}
+
+Post.init(
     {
         id: {
             type: DataTypes.INTEGER,
@@ -28,6 +46,7 @@ const Post = db.define(
         },
     },
     {
+        sequelize: db,
         tableName: "posts",
     },
 );

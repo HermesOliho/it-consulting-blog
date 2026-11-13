@@ -53,10 +53,8 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASS, {
             `Connexion à la base de données ${DB_NAME} réussie en mode ${NODE_ENV}`,
         );
     } catch (err) {
-        console.error(
-            "Erreur de connexion à la base de données :",
-            err.message,
-        );
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("Erreur de connexion à la base de données :", message);
     }
 })();
 

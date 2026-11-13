@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env";
 import { User } from "../models/index.model";
+import type { UserRole } from "../models/user.model";
 
 const jwtSecret = JWT_SECRET;
 
@@ -10,8 +11,6 @@ if (!jwtSecret) {
         "Veuillez définir JWT_SECRET dans les variables d'environnement.",
     );
 }
-
-export type UserRole = "super_admin" | "admin";
 
 export type AuthTokenPayload = JwtPayload & {
     sub: string;
@@ -90,7 +89,7 @@ export const requireRole =
                 });
             }
 
-            const role = user.get("role") as UserRole;
+            const role = user.role;
 
             if (!allowedRoles.includes(role)) {
                 return res.status(403).json({
