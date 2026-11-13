@@ -3,6 +3,9 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { JWT_SECRET } from "../config/env";
 import { User } from "../models/index.model";
+import { toUserDto } from "../mappers";
+import type { ApiMessage, ApiResponse } from "../types/api";
+import type { LoginRequest, LoginResponse } from "../types/auth";
 
 const jwtSecret = JWT_SECRET;
 
@@ -12,9 +15,10 @@ if (!jwtSecret) {
     );
 }
 
-const userAttributes = ["id", "name", "email", "role"];
-
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+    req: Request<{}, ApiResponse<LoginResponse>, LoginRequest>,
+    res: Response<ApiResponse<LoginResponse>>,
+) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({
@@ -42,14 +46,10 @@ export const login = async (req: Request, res: Response) => {
             },
         );
 
-        const safeUser = await User.findByPk(user.id, {
-            attributes: userAttributes,
-        });
-
         return res.status(200).json({
             success: true,
             data: {
-                user: safeUser,
+                user: toUserDto(user),
                 token,
                 tokenType: "Bearer",
                 expiresIn: 3600,
@@ -64,7 +64,7 @@ export const login = async (req: Request, res: Response) => {
     }
 };
 
-export const logout = (req: Request, res: Response) => {
+export const logout = (req: Request, res: Response<ApiMessage>) => {
     return res.status(200).json({
         success: true,
         message:

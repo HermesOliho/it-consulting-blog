@@ -59,6 +59,17 @@ export const commentListQuerySchema = z
     })
     .strict();
 
+export type CreateGuestCommentInput = z.infer<
+    typeof createGuestCommentSchema
+>;
+export type CreateMemberCommentInput = z.infer<
+    typeof createMemberCommentSchema
+>;
+export type UpdateCommentInput = z.infer<typeof updateCommentSchema>;
+export type CommentIdParams = z.infer<typeof commentIdParamsSchema>;
+export type CommentPostIdParams = z.infer<typeof commentPostIdParamsSchema>;
+export type CommentListQuery = z.infer<typeof commentListQuerySchema>;
+
 type Schema = z.ZodType;
 
 const validate =

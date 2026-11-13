@@ -2,7 +2,15 @@ import argon2 from "argon2";
 import { Request, Response } from "express";
 import { User } from "../models/index.model";
 import { isValidId } from "../utils";
+import { toUserDto } from "../mappers";
 import type { UserRole } from "../models/user.model";
+import type { ApiError, ApiResponse } from "../types/api";
+import type { UserDto } from "../types/user";
+import type {
+    CreateUserInput,
+    UpdateUserInput,
+    UserIdParams,
+} from "../validators/user.validator";
 
 const userAttributes = [
     "id",
@@ -13,14 +21,17 @@ const userAttributes = [
     "updatedAt",
 ];
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsers = async (
+    req: Request<{}, ApiResponse<UserDto[]>>,
+    res: Response<ApiResponse<UserDto[]>>,
+) => {
     try {
         const users = await User.findAll({
             attributes: userAttributes,
         });
         return res.status(200).json({
             success: true,
-            data: users,
+            data: users.map(toUserDto),
         });
     } catch (error) {
         console.error(
@@ -34,7 +45,10 @@ export const getAllUsers = async (req: Request, res: Response) => {
     }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (
+    req: Request<UserIdParams, ApiResponse<UserDto>>,
+    res: Response<ApiResponse<UserDto>>,
+) => {
     try {
         const { id } = req.params;
 
@@ -58,7 +72,7 @@ export const getUserById = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            data: user,
+            data: toUserDto(user),
         });
     } catch (error) {
         console.error(
@@ -72,7 +86,10 @@ export const getUserById = async (req: Request, res: Response) => {
     }
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (
+    req: Request<{}, ApiResponse<UserDto>, CreateUserInput>,
+    res: Response<ApiResponse<UserDto>>,
+) => {
     try {
         const { name, email, password, role } = req.body;
 
@@ -99,9 +116,7 @@ export const createUser = async (req: Request, res: Response) => {
 
         return res.status(201).json({
             success: true,
-            data: await User.findByPk(user.id, {
-                attributes: userAttributes,
-            }),
+            data: toUserDto(user),
         });
     } catch (error) {
         console.error("Erreur lors de la création de l'utilisateur :", error);
@@ -112,7 +127,10 @@ export const createUser = async (req: Request, res: Response) => {
     }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (
+    req: Request<UserIdParams, ApiResponse<UserDto>, UpdateUserInput>,
+    res: Response<ApiResponse<UserDto>>,
+) => {
     try {
         const { id } = req.params;
         const { name, email, password, role } = req.body;
@@ -166,9 +184,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            data: await User.findByPk(Number(id), {
-                attributes: userAttributes,
-            }),
+            data: toUserDto(user),
         });
     } catch (error) {
         console.error(
@@ -182,7 +198,10 @@ export const updateUser = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (
+    req: Request<UserIdParams, ApiError>,
+    res: Response<ApiError>,
+) => {
     try {
         const { id } = req.params;
 

@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "../config/env";
 import { User } from "../models/index.model";
 import type { UserRole } from "../models/user.model";
+import type { AuthTokenPayload } from "../types/auth";
 
 const jwtSecret = JWT_SECRET;
 
@@ -12,10 +13,20 @@ if (!jwtSecret) {
     );
 }
 
-export type AuthTokenPayload = JwtPayload & {
-    sub: string;
-    email: string;
-    role?: UserRole;
+const isAuthTokenPayload = (
+    payload: string | JwtPayload,
+): payload is AuthTokenPayload => {
+    if (typeof payload === "string") {
+        return false;
+    }
+
+    return (
+        typeof payload.sub === "string" &&
+        typeof payload.email === "string" &&
+        (payload.role === undefined ||
+            payload.role === "super_admin" ||
+            payload.role === "admin")
+    );
 };
 
 export const requireAuth = (
@@ -36,18 +47,14 @@ export const requireAuth = (
     try {
         const payload = jwt.verify(token, jwtSecret);
 
-        if (
-            typeof payload === "string" ||
-            typeof payload.sub !== "string" ||
-            typeof payload.email !== "string"
-        ) {
+        if (!isAuthTokenPayload(payload)) {
             return res.status(401).json({
                 success: false,
                 message: "Token d'authentification invalide.",
             });
         }
 
-        res.locals.auth = payload as AuthTokenPayload;
+        res.locals.auth = payload;
         next();
     } catch (error) {
         return res.status(401).json({
@@ -68,7 +75,7 @@ export const requireRole =
     (...allowedRoles: UserRole[]) =>
     async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const auth = res.locals.auth as AuthTokenPayload | undefined;
+            const auth = res.locals.auth;
             const userId = Number(auth?.sub);
 
             if (!auth || !Number.isInteger(userId) || userId <= 0) {

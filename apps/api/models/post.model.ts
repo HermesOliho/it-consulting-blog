@@ -4,8 +4,10 @@ import {
     InferAttributes,
     InferCreationAttributes,
     Model,
+    NonAttribute,
 } from "sequelize";
 import db from "../config/db";
+import type User from "./user.model";
 
 class Post extends Model<
     InferAttributes<Post, { omit: "createdAt" | "updatedAt" }>,
@@ -18,6 +20,8 @@ class Post extends Model<
     declare authorId: number;
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date>;
+
+    declare author?: NonAttribute<User | null>;
 }
 
 Post.init(

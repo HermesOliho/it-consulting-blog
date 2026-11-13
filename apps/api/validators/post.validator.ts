@@ -33,6 +33,10 @@ export const postIdParamsSchema = z.object({
     id: z.string().regex(/^[1-9]\d*$/, "Identifiant invalide."),
 });
 
+export type CreatePostInput = z.infer<typeof createPostSchema>;
+export type UpdatePostInput = z.infer<typeof updatePostSchema>;
+export type PostIdParams = z.infer<typeof postIdParamsSchema>;
+
 type Schema = z.ZodType;
 
 const validate =

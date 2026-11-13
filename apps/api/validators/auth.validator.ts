@@ -8,6 +8,8 @@ export const loginSchema = z
     })
     .strict();
 
+export type LoginInput = z.infer<typeof loginSchema>;
+
 export const validateLogin: RequestHandler = (
     req: Request,
     res: Response,

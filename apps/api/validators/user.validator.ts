@@ -29,6 +29,10 @@ export const userIdParamsSchema = z.object({
     id: z.string().regex(/^[1-9]\d*$/, "Identifiant invalide."),
 });
 
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export type UserIdParams = z.infer<typeof userIdParamsSchema>;
+
 type Schema = z.ZodType;
 
 const validate =

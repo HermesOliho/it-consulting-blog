@@ -1,5 +1,16 @@
 import { Request, Response } from "express";
 import { Comment, Post, User } from "../models/index.model";
+import { toAdminCommentDto, toPublicCommentDto } from "../mappers";
+import type { ApiError, ApiResponse } from "../types/api";
+import type { AdminCommentDto, PublicCommentDto } from "../types/comment";
+import type {
+    CommentIdParams,
+    CommentListQuery,
+    CommentPostIdParams,
+    CreateGuestCommentInput,
+    CreateMemberCommentInput,
+    UpdateCommentInput,
+} from "../validators/comment.validator";
 
 const commentQueryOptions = {
     include: [
@@ -12,51 +23,6 @@ const commentQueryOptions = {
     ],
 };
 
-const getAuthor = (comment: Comment): User | null =>
-    comment.author ?? null;
-
-const formatPublicComment = (comment: Comment) => {
-    const author = getAuthor(comment);
-
-    return {
-        id: comment.id,
-        postId: comment.postId,
-        content: comment.content,
-        authorType: comment.authorType,
-        name: comment.name,
-        author: author
-            ? {
-                  id: author.id,
-                  name: author.name,
-              }
-            : null,
-        createdAt: comment.createdAt,
-    };
-};
-
-const formatAdminComment = (comment: Comment) => {
-    const author = getAuthor(comment);
-
-    return {
-        id: comment.id,
-        postId: comment.postId,
-        content: comment.content,
-        approved: comment.approved,
-        authorType: comment.authorType,
-        name: comment.name,
-        email: author ? author.email : comment.email,
-        author: author
-            ? {
-                  id: author.id,
-                  name: author.name,
-                  email: author.email,
-              }
-            : null,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt,
-    };
-};
-
 const postExists = async (postId: number) => {
     const post = await Post.findByPk(postId, { attributes: ["id"] });
     return Boolean(post);
@@ -66,8 +32,8 @@ const findCommentWithAuthor = (id: number) =>
     Comment.findByPk(id, commentQueryOptions);
 
 export const getApprovedCommentsByPost = async (
-    req: Request,
-    res: Response,
+    req: Request<CommentPostIdParams, ApiResponse<PublicCommentDto[]>>,
+    res: Response<ApiResponse<PublicCommentDto[]>>,
 ) => {
     try {
         const postId = Number(req.params.postId);
@@ -87,7 +53,7 @@ export const getApprovedCommentsByPost = async (
 
         return res.status(200).json({
             success: true,
-            data: comments.map(formatPublicComment),
+            data: comments.map(toPublicCommentDto),
         });
     } catch (error) {
         console.error(
@@ -101,7 +67,14 @@ export const getApprovedCommentsByPost = async (
     }
 };
 
-export const createGuestComment = async (req: Request, res: Response) => {
+export const createGuestComment = async (
+    req: Request<
+        CommentPostIdParams,
+        ApiResponse<PublicCommentDto>,
+        CreateGuestCommentInput
+    >,
+    res: Response<ApiResponse<PublicCommentDto>>,
+) => {
     try {
         const postId = Number(req.params.postId);
 
@@ -128,7 +101,7 @@ export const createGuestComment = async (req: Request, res: Response) => {
             success: true,
             message:
                 "Commentaire envoyé. Il sera visible après approbation.",
-            data: formatPublicComment(comment),
+            data: toPublicCommentDto(comment),
         });
     } catch (error) {
         console.error("Erreur lors de la création du commentaire :", error);
@@ -139,14 +112,17 @@ export const createGuestComment = async (req: Request, res: Response) => {
     }
 };
 
-export const getAllComments = async (req: Request, res: Response) => {
+export const getAllComments = async (
+    req: Request<{}, ApiResponse<AdminCommentDto[]>, unknown, CommentListQuery>,
+    res: Response<ApiResponse<AdminCommentDto[]>>,
+) => {
     try {
         const where: {
             postId?: number;
             approved?: boolean;
         } = {};
 
-        if (typeof req.query.postId === "string") {
+        if (req.query.postId !== undefined) {
             where.postId = Number(req.query.postId);
         }
 
@@ -164,7 +140,7 @@ export const getAllComments = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            data: comments.map(formatAdminComment),
+            data: comments.map(toAdminCommentDto),
         });
     } catch (error) {
         console.error(
@@ -178,7 +154,10 @@ export const getAllComments = async (req: Request, res: Response) => {
     }
 };
 
-export const getCommentById = async (req: Request, res: Response) => {
+export const getCommentById = async (
+    req: Request<CommentIdParams, ApiResponse<AdminCommentDto>>,
+    res: Response<ApiResponse<AdminCommentDto>>,
+) => {
     try {
         const comment = await findCommentWithAuthor(Number(req.params.id));
 
@@ -191,7 +170,7 @@ export const getCommentById = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            data: formatAdminComment(comment),
+            data: toAdminCommentDto(comment),
         });
     } catch (error) {
         console.error(
@@ -205,7 +184,14 @@ export const getCommentById = async (req: Request, res: Response) => {
     }
 };
 
-export const updateCommentApproval = async (req: Request, res: Response) => {
+export const updateCommentApproval = async (
+    req: Request<
+        CommentIdParams,
+        ApiResponse<AdminCommentDto>,
+        UpdateCommentInput
+    >,
+    res: Response<ApiResponse<AdminCommentDto>>,
+) => {
     try {
         const commentId = Number(req.params.id);
         const comment = await Comment.findByPk(commentId);
@@ -230,7 +216,7 @@ export const updateCommentApproval = async (req: Request, res: Response) => {
 
         return res.status(200).json({
             success: true,
-            data: formatAdminComment(updatedComment),
+            data: toAdminCommentDto(updatedComment),
         });
     } catch (error) {
         console.error(
@@ -244,7 +230,10 @@ export const updateCommentApproval = async (req: Request, res: Response) => {
     }
 };
 
-export const deleteComment = async (req: Request, res: Response) => {
+export const deleteComment = async (
+    req: Request<CommentIdParams, ApiError>,
+    res: Response<ApiError>,
+) => {
     try {
         const deletedCount = await Comment.destroy({
             where: { id: Number(req.params.id) },
@@ -270,7 +259,14 @@ export const deleteComment = async (req: Request, res: Response) => {
     }
 };
 
-export const createMemberComment = async (req: Request, res: Response) => {
+export const createMemberComment = async (
+    req: Request<
+        CommentPostIdParams,
+        ApiResponse<AdminCommentDto>,
+        CreateMemberCommentInput
+    >,
+    res: Response<ApiResponse<AdminCommentDto>>,
+) => {
     try {
         const postId = Number(req.params.postId);
         const userId = Number(res.locals.auth?.sub);
@@ -314,7 +310,7 @@ export const createMemberComment = async (req: Request, res: Response) => {
 
         return res.status(201).json({
             success: true,
-            data: formatAdminComment(createdComment),
+            data: toAdminCommentDto(createdComment),
         });
     } catch (error) {
         console.error(

@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
 import { Post, User } from "../models/index.model";
+import { toPostDto } from "../mappers";
 import { isValidId } from "../utils";
+import type { ApiError, ApiResponse } from "../types/api";
+import type { PostDto } from "../types/post";
+import type {
+    CreatePostInput,
+    PostIdParams,
+    UpdatePostInput,
+} from "../validators/post.validator";
 
 const postAttributes = [
     "id",
@@ -47,14 +55,20 @@ const getAvailableSlug = async (title: string) => {
     return slug;
 };
 
-export const getAllPosts = async (req: Request, res: Response) => {
+export const getAllPosts = async (
+    req: Request<{}, ApiResponse<PostDto[]>>,
+    res: Response<ApiResponse<PostDto[]>>,
+) => {
     try {
         const posts = await Post.findAll({
             ...postQueryOptions,
             order: [["createdAt", "DESC"]],
         });
 
-        return res.status(200).json({ success: true, data: posts });
+        return res.status(200).json({
+            success: true,
+            data: posts.map(toPostDto),
+        });
     } catch (error) {
         console.error("Erreur lors de la récupération des articles :", error);
         return res.status(500).json({
@@ -64,7 +78,10 @@ export const getAllPosts = async (req: Request, res: Response) => {
     }
 };
 
-export const getPostById = async (req: Request, res: Response) => {
+export const getPostById = async (
+    req: Request<PostIdParams, ApiResponse<PostDto>>,
+    res: Response<ApiResponse<PostDto>>,
+) => {
     try {
         const postId = getPostId(req.params.id);
 
@@ -84,7 +101,10 @@ export const getPostById = async (req: Request, res: Response) => {
             });
         }
 
-        return res.status(200).json({ success: true, data: post });
+        return res.status(200).json({
+            success: true,
+            data: toPostDto(post),
+        });
     } catch (error) {
         console.error("Erreur lors de la récupération de l'article :", error);
         return res.status(500).json({
@@ -94,7 +114,10 @@ export const getPostById = async (req: Request, res: Response) => {
     }
 };
 
-export const createPost = async (req: Request, res: Response) => {
+export const createPost = async (
+    req: Request<{}, ApiResponse<PostDto>, CreatePostInput>,
+    res: Response<ApiResponse<PostDto>>,
+) => {
     try {
         const authorId = Number(res.locals.auth?.sub);
 
@@ -117,13 +140,21 @@ export const createPost = async (req: Request, res: Response) => {
         }
 
         const post = await Post.create({ title, slug, content, authorId });
+        const createdPost = await Post.findByPk(
+            post.id,
+            postQueryOptions,
+        );
+
+        if (!createdPost) {
+            return res.status(500).json({
+                success: false,
+                message: "Erreur serveur !",
+            });
+        }
 
         return res.status(201).json({
             success: true,
-            data: await Post.findByPk(
-                post.id,
-                postQueryOptions,
-            ),
+            data: toPostDto(createdPost),
         });
     } catch (error) {
         console.error("Erreur lors de la création de l'article :", error);
@@ -134,7 +165,10 @@ export const createPost = async (req: Request, res: Response) => {
     }
 };
 
-export const updatePost = async (req: Request, res: Response) => {
+export const updatePost = async (
+    req: Request<PostIdParams, ApiResponse<PostDto>, UpdatePostInput>,
+    res: Response<ApiResponse<PostDto>>,
+) => {
     try {
         const postId = getPostId(req.params.id);
 
@@ -169,9 +203,18 @@ export const updatePost = async (req: Request, res: Response) => {
 
         await post.update({ title, slug, content });
 
+        const updatedPost = await Post.findByPk(postId, postQueryOptions);
+
+        if (!updatedPost) {
+            return res.status(404).json({
+                success: false,
+                message: "Article non trouvé !",
+            });
+        }
+
         return res.status(200).json({
             success: true,
-            data: await Post.findByPk(postId, postQueryOptions),
+            data: toPostDto(updatedPost),
         });
     } catch (error) {
         console.error("Erreur lors de la modification de l'article :", error);
@@ -182,7 +225,10 @@ export const updatePost = async (req: Request, res: Response) => {
     }
 };
 
-export const deletePost = async (req: Request, res: Response) => {
+export const deletePost = async (
+    req: Request<PostIdParams, ApiError>,
+    res: Response<ApiError>,
+) => {
     try {
         const postId = getPostId(req.params.id);
 
