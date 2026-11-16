@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react'
 import { FiMessageCircle, FiSend } from 'react-icons/fi'
-import { Link } from 'react-router-dom'
 import { createComment } from '../../api/comments'
 import { getErrorMessage } from '../../lib/http'
 import type { BlogComment, CommentIdentity } from '../../types/comments'
@@ -27,17 +26,29 @@ export default function CommentSection({ articleId, currentUser }: CommentSectio
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!currentUser) return
 
     const form = event.currentTarget
-    const content = String(new FormData(form).get('content') ?? '').trim()
+    const formData = new FormData(form)
+    const content = String(formData.get('content') ?? '').trim()
     if (content.length < 2) return
+    const guest =
+      currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN'
+        ? undefined
+        : {
+            name: String(formData.get('name') ?? '').trim(),
+            email: String(formData.get('email') ?? '').trim(),
+          }
 
     setIsSubmitting(true)
     setSubmitError('')
     setNotice('')
     try {
-      const created: BlogComment = await createComment(articleId, content, currentUser)
+      const created: BlogComment = await createComment(
+        articleId,
+        content,
+        currentUser,
+        guest,
+      )
       form.reset()
       reload()
       setNotice(
@@ -91,39 +102,63 @@ export default function CommentSection({ articleId, currentUser }: CommentSectio
         <h3 className="comment-form-wrap__title">
           <FiMessageCircle aria-hidden="true" /> Ajouter un commentaire
         </h3>
-        {currentUser ? (
-          <form className="comment-form" onSubmit={handleSubmit}>
+        <form className="comment-form" onSubmit={handleSubmit}>
+          {currentUser ? (
             <p>
-              Connecté en tant que <strong>{currentUser.name}</strong>.{' '}
+              Connecté en tant que <strong>{currentUser.name}</strong>.
               {currentUser.role === 'VISITOR' &&
-                'Ton commentaire sera visible après validation par un administrateur.'}
+                ' Ton commentaire sera visible après validation par un administrateur.'}
             </p>
-            <label htmlFor={`comment-content-${articleId}`}>Ton commentaire</label>
-            <textarea
-              className="input comment-form__textarea"
-              id={`comment-content-${articleId}`}
-              maxLength={2000}
-              minLength={2}
-              name="content"
-              placeholder="Partage ton point de vue…"
-              required
-              rows={5}
-            />
-            {submitError && <p className="comment-form__error" role="alert">{submitError}</p>}
-            {notice && <p className="comment-form__notice" role="status">{notice}</p>}
-            <button className="btn btn--primary" disabled={isSubmitting} type="submit">
-              <FiSend aria-hidden="true" />
-              {isSubmitting ? 'Envoi en cours…' : 'Envoyer le commentaire'}
-            </button>
-          </form>
-        ) : (
-          <div className="comment-signin">
-            <p>Connecte-toi pour participer à la conversation.</p>
-            <Link className="btn btn--primary" to="/admin/login">
-              Se connecter
-            </Link>
-          </div>
-        )}
+          ) : (
+            <p>
+              Vous pouvez commenter sans compte. Votre commentaire sera visible
+              après validation par un administrateur.
+            </p>
+          )}
+          {currentUser?.role !== 'ADMIN' && currentUser?.role !== 'SUPER_ADMIN' && (
+            <>
+              <label htmlFor={`comment-name-${articleId}`}>Ton nom</label>
+              <input
+                autoComplete="name"
+                className="input"
+                defaultValue={currentUser?.name ?? ''}
+                id={`comment-name-${articleId}`}
+                maxLength={100}
+                minLength={1}
+                name="name"
+                required
+              />
+              <label htmlFor={`comment-email-${articleId}`}>Ton adresse email</label>
+              <input
+                autoComplete="email"
+                className="input"
+                defaultValue={currentUser?.email ?? ''}
+                id={`comment-email-${articleId}`}
+                maxLength={150}
+                name="email"
+                required
+                type="email"
+              />
+            </>
+          )}
+          <label htmlFor={`comment-content-${articleId}`}>Ton commentaire</label>
+          <textarea
+            className="input comment-form__textarea"
+            id={`comment-content-${articleId}`}
+            maxLength={2000}
+            minLength={2}
+            name="content"
+            placeholder="Partage ton point de vue…"
+            required
+            rows={5}
+          />
+          {submitError && <p className="comment-form__error" role="alert">{submitError}</p>}
+          {notice && <p className="comment-form__notice" role="status">{notice}</p>}
+          <button className="btn btn--primary" disabled={isSubmitting} type="submit">
+            <FiSend aria-hidden="true" />
+            {isSubmitting ? 'Envoi en cours…' : 'Envoyer le commentaire'}
+          </button>
+        </form>
       </div>
     </section>
   )

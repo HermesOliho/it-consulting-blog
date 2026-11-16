@@ -3,7 +3,7 @@
 ## Objectif
 
 Afficher les commentaires publics approuvés, permettre à un utilisateur
-connecté d’en soumettre un et fournir à l’administration une file de
+d’en soumettre un et fournir à l’administration une file de
 modération.
 
 ## Fichiers
@@ -25,9 +25,10 @@ modération.
 ## Parcours public
 
 Sur `/articles/:id`, le composant affiche uniquement les commentaires dont
-`isApproved` est vrai. Un utilisateur connecté peut envoyer un commentaire. La
-création envoie seulement `{ content }`; l’identité doit être déterminée par le
-serveur à partir de la session et ne doit pas être acceptée depuis le formulaire.
+`isApproved` est vrai. Un visiteur peut commenter sans compte en indiquant son
+nom et son email; le backend enregistre alors son commentaire comme non approuvé.
+Un administrateur connecté envoie seulement `{ content }` avec sa session, et
+son commentaire est publié immédiatement.
 
 Les badges distinguent :
 
@@ -58,24 +59,31 @@ Quand `VITE_USE_MOCK=true` en développement :
 Le mock est en mémoire : ses changements ne sont pas persistants après le
 redémarrage de l’application.
 
-## Limites d’intégration
+## Contrat API et limites
 
-Le backend actuel n’expose pas encore de routes pour les commentaires. Les
-endpoints attendus par `src/api/comments.ts` sont :
+`src/api/comments.ts` adapte le DTO backend (`postId`, `approved`,
+`authorType`, `createdAt`) au modèle frontend (`article_id`, `isApproved`,
+`created_at`). Les routes réelles sont :
 
 | Méthode | Route | Accès |
 |---|---|---|
-| `GET` | `/api/articles/:articleId/comments` | Public, approuvés uniquement |
-| `POST` | `/api/articles/:articleId/comments` | Utilisateur connecté |
-| `GET` | `/api/admin/comments?status=pending` | `ADMIN` ou `SUPER_ADMIN` |
-| `PATCH` | `/api/admin/comments/:id/approval` | `ADMIN` ou `SUPER_ADMIN` |
+| `GET` | `/api/articles/:postId/comments` | Public, commentaires approuvés uniquement |
+| `POST` | `/api/articles/:postId/comments` | Public, `{ name, email, content }`, en attente |
+| `POST` | `/api/admin/articles/:postId/comments` | Admin connecté, `{ content }`, publié |
+| `GET` | `/api/admin/comments?approved=false` | `ADMIN` ou `SUPER_ADMIN` |
+| `PATCH` | `/api/admin/comments/:id` | `ADMIN` ou `SUPER_ADMIN`, `{ approved: true }` |
 
 Le contexte d’authentification actuel ne connaît que `ADMIN` et `SUPER_ADMIN`;
-la connexion VISITOR n’est pas encore fournie. `App` expose une prop optionnelle
-`commentUser` pour qu’un futur module puisse injecter une identité visiteur.
-Les champs agent (`isAgent`, `agentBadgeLabel`) doivent aussi être fournis par le
-profil utilisateur lorsque cette fonctionnalité sera disponible côté gestion
-des utilisateurs.
+la connexion VISITOR n’est pas fournie. Les visiteurs peuvent toutefois
+commenter via le parcours public anonyme de l’API. `App` expose une prop
+optionnelle `commentUser` pour qu’un autre module puisse injecter une identité
+visiteur.
+
+Le DTO et le modèle backend ne renvoient pas encore les champs agent
+(`isAgent`, `agentBadgeLabel`). L’interface sait afficher ces champs lorsqu’ils
+sont fournis (notamment par les mocks), mais le badge agent ne peut pas être
+déterminé de manière fiable avec les données API actuelles. La gestion de ces
+champs dépend du module utilisateurs et n’est pas modifiée ici.
 
 ## Vérification
 

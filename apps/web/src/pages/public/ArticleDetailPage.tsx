@@ -19,7 +19,13 @@ export default function ArticleDetailPage({ commentUser }: ArticleDetailPageProp
   const currentUser: CommentIdentity | null =
     commentUser === undefined
       ? user
-        ? { id: user.id, name: user.name, role: user.role, isAgent: false }
+        ? {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            isAgent: false,
+          }
         : null
       : commentUser
   const { id } = useParams()

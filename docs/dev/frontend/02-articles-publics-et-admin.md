@@ -52,9 +52,14 @@ pas ces pages et ne redéfinit pas leur logique.
 
 - Les appels réels passent par `apps/web/src/lib/http.ts`, qui préfixe les
   chemins par `/api` par défaut et gère le format JSON de l’API.
-- `listArticles` accepte la réponse paginée du frontend et la réponse enveloppée
-  `{ success, data }` de l’API actuelle.
+- Les réponses article de l’API sont enveloppées dans `{ success, data }`;
+  les listes fournissent aussi `meta` avec le total et les informations de
+  pagination. `src/api/articleDto.ts` adapte ce contrat au modèle utilisé par
+  les composants frontend.
+- Les routes de catégories renvoient également une enveloppe `{ success, data }`.
 - `getArticleById` charge `GET /api/articles/:id`.
+- Le CRUD admin utilise `/api/admin/articles`; la création et les modifications
+  envoient les champs `cover_image` et `category_id`, acceptés par le backend.
 - En développement, définir `VITE_USE_MOCK=true` dans `.env.local` pour utiliser
   les données de `src/mocks/articles.ts`.
 
@@ -68,11 +73,3 @@ npm run lint
 
 En mode mock, ouvrir `/articles`, essayer une recherche et un filtre, naviguer
 entre les pages disponibles, puis ouvrir une carte.
-
-## Limites connues
-
-L’API actuelle renvoie ses articles sous la forme `{ success, data }` et
-identifie le détail avec un ID. Elle n’implémente pas encore toute la pagination
-et les filtres utilisés par le catalogue; le frontend normalise la réponse
-actuelle, mais une pagination réelle côté serveur nécessitera un contrat backend
-compatible.

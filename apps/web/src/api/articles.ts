@@ -1,6 +1,13 @@
 import { http } from '../lib/http'
 import { USE_MOCK } from '../lib/config'
 import type { Article, Category, ListArticlesParams, Paginated } from '../types'
+import {
+  normalizeArticle,
+  normalizeArticlePage,
+  type ApiEnvelope,
+  type ApiListEnvelope,
+  type ArticleDto,
+} from './articleDto'
 
 // GET /api/articles?page=1&limit=3&search=react&category=outils
 export async function listArticles(
@@ -19,18 +26,14 @@ export async function listArticles(
   if (params.category) query.set('category', params.category)
   const qs = query.toString()
 
-  const response = await http<
-    Paginated<Article> | { success: boolean; data: Article[] }
-  >(`/articles${qs ? `?${qs}` : ''}`)
+  const response = await http<ApiListEnvelope<ArticleDto>>(
+    `/articles${qs ? `?${qs}` : ''}`,
+  )
 
-  if ('total' in response) return response
-
-  return {
-    data: response.data,
-    total: response.data.length,
+  return normalizeArticlePage(response, {
     page: params.page ?? 1,
-    limit: params.limit ?? response.data.length,
-  }
+    limit: params.limit ?? 10,
+  })
 }
 
 // GET /api/articles/:id
@@ -40,11 +43,9 @@ export async function getArticleById(id: number): Promise<Article> {
     return mock.getArticleById(id)
   }
 
-  const response = await http<Article | { success: boolean; data: Article }>(
-    `/articles/${id}`,
-  )
+  const response = await http<ApiEnvelope<ArticleDto>>(`/articles/${id}`)
 
-  return 'data' in response ? response.data : response
+  return normalizeArticle(response.data)
 }
 
 // GET /api/categories
@@ -53,5 +54,6 @@ export async function listCategories(): Promise<Category[]> {
     const mock = await import('../mocks/articles')
     return mock.listCategories()
   }
-  return http<Category[]>('/categories')
+  const response = await http<ApiEnvelope<Category[]>>('/categories')
+  return response.data
 }

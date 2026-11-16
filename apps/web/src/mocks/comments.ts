@@ -1,4 +1,8 @@
-import type { BlogComment, CommentIdentity } from '../types/comments'
+import type {
+  BlogComment,
+  CommentIdentity,
+  GuestCommentInput,
+} from '../types/comments'
 
 const delay = (ms = 250) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -42,15 +46,33 @@ export async function listApprovedComments(articleId: number): Promise<BlogComme
 export async function createComment(
   articleId: number,
   content: string,
-  author: CommentIdentity,
+  identity: CommentIdentity | null,
+  guest?: GuestCommentInput,
 ): Promise<BlogComment> {
   await delay()
+  let author: CommentIdentity
+  if (identity && identity.role !== 'VISITOR') {
+    author = identity
+  } else {
+    if (!guest || !guest.name.trim() || !guest.email.trim()) {
+      throw new Error('Le nom et l’adresse email sont obligatoires.')
+    }
+    author = {
+      ...identity,
+      name: guest.name,
+      email: guest.email,
+      role: 'VISITOR',
+      isAgent: identity?.isAgent ?? false,
+      agentBadgeLabel: identity?.agentBadgeLabel,
+    }
+  }
+  const isMember = author.role !== 'VISITOR'
   const comment: BlogComment = {
     id: nextCommentId++,
     article_id: articleId,
     content,
     created_at: new Date().toISOString(),
-    isApproved: author.role !== 'VISITOR',
+    isApproved: isMember,
     author,
   }
   comments.push(comment)
