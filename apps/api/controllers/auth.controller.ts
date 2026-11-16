@@ -6,6 +6,7 @@ import { User } from "../models/index.model";
 import { toUserDto } from "../mappers";
 import type { ApiMessage, ApiResponse } from "../types/api";
 import type { LoginRequest, LoginResponse } from "../types/auth";
+import type { UserDto } from "../types/user";
 
 const jwtSecret = JWT_SECRET;
 
@@ -57,6 +58,54 @@ export const login = async (
         });
     } catch (error) {
         console.error("Erreur lors de l'authentification :", error);
+        return res.status(500).json({
+            success: false,
+            message: "Erreur serveur !",
+        });
+    }
+};
+
+export const getCurrentUser = async (
+    req: Request,
+    res: Response<ApiResponse<UserDto>>,
+) => {
+    try {
+        const userId = Number(res.locals.auth?.sub);
+
+        if (!Number.isInteger(userId) || userId <= 0) {
+            return res.status(401).json({
+                success: false,
+                message: "Utilisateur authentifié invalide.",
+            });
+        }
+
+        const user = await User.findByPk(userId, {
+            attributes: [
+                "id",
+                "name",
+                "email",
+                "role",
+                "createdAt",
+                "updatedAt",
+            ],
+        });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Utilisateur authentifié introuvable.",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: toUserDto(user),
+        });
+    } catch (error) {
+        console.error(
+            "Erreur lors de la récupération de l'utilisateur authentifié :",
+            error,
+        );
         return res.status(500).json({
             success: false,
             message: "Erreur serveur !",
