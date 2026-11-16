@@ -2,10 +2,18 @@ import db from "../config/db";
 import User from "./user.model";
 import Post from "./post.model";
 import Comment from "./comment.model";
+import Category from "./category.model";
 
 // Définition des associations
 User.hasMany(Post, { foreignKey: "authorId", as: "posts" });
 Post.belongsTo(User, { foreignKey: "authorId", as: "author" });
+
+Category.hasMany(Post, { foreignKey: "categoryId", as: "posts" });
+Post.belongsTo(Category, {
+    foreignKey: "categoryId",
+    as: "category",
+    onDelete: "SET NULL",
+});
 
 Post.hasMany(Comment, {
     foreignKey: "postId",
@@ -31,4 +39,4 @@ const syncModels = async () => {
     }
 };
 
-export { User, Post, Comment, syncModels };
+export { User, Post, Comment, Category, syncModels };

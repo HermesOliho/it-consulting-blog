@@ -5,23 +5,15 @@ import { PORT } from "./config/env";
 import userRouter from "./routes/admin/user.route";
 import authRouter from "./routes/auth.route";
 import articleRouter from "./routes/article.route";
+import categoryRouter from "./routes/category.route";
 import adminArticleRouter from "./routes/admin/article.route";
+import adminCategoryRouter from "./routes/admin/category.route";
 import adminCommentRouter from "./routes/admin/comment.route";
 import adminAuthRouter from "./routes/admin/auth.route";
-// import { PORT } from "./config/env";
 
 const app = express();
 
 app.use(express.json());
-
-// Test du serveur (route racine)
-app.get("/", (req, res) => {
-    return res
-        .status(200)
-        .send(
-            "Bienvenue sur l'API de mon blog IT Consulting ! Tout marche très bien.",
-        );
-});
 
 // Autoriser les URL des frontends et les méthodes HTTP via CORS
 app.use(
@@ -31,12 +23,23 @@ app.use(
     }),
 );
 
+// Test du serveur (route racine)
+app.get("/", (_req, res) => {
+    return res
+        .status(200)
+        .send(
+            "Bienvenue sur l'API de mon blog IT Consulting ! Tout marche très bien.",
+        );
+});
+
 // Déclarer les routes
 app.use("/api/admin/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/admin/auth", adminAuthRouter);
 app.use("/api/articles", articleRouter);
+app.use("/api/categories", categoryRouter);
 app.use("/api/admin/articles", adminArticleRouter);
+app.use("/api/admin/categories", adminCategoryRouter);
 app.use("/api/admin/comments", adminCommentRouter);
 
 app.listen(PORT, async (err) => {

@@ -7,7 +7,7 @@ import {
     createGuestComment,
     getApprovedCommentsByPost,
 } from "../controllers/comment.controller";
-import { validatePostId } from "../validators/post.validator";
+import { validateListPostsQuery, validatePostId } from "../validators/post.validator";
 import {
     validateCommentPostId,
     validateCreateGuestComment,
@@ -15,7 +15,7 @@ import {
 
 const articleRouter = Router();
 
-articleRouter.get("/", getAllPosts);
+articleRouter.get("/", validateListPostsQuery, getAllPosts);
 articleRouter.get(
     "/:postId/comments",
     validateCommentPostId,

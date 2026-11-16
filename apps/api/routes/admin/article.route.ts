@@ -5,11 +5,13 @@ import {
     getAllPosts,
     getPostById,
     updatePost,
+    updatePostStatus,
 } from "../../controllers/post.controller";
 import { createMemberComment } from "../../controllers/comment.controller";
 import { requireAuth, requireRole } from "../../middlewares/auth.middleware";
 import {
     validateCreatePost,
+    validateListPostsQuery,
     validatePostId,
     validateUpdatePost,
 } from "../../validators/post.validator";
@@ -22,7 +24,7 @@ const adminArticleRouter = Router();
 
 // Gestion des articles : super_admin et admin.
 adminArticleRouter.use(requireAuth, requireRole("super_admin", "admin"));
-adminArticleRouter.get("/", getAllPosts);
+adminArticleRouter.get("/", validateListPostsQuery, getAllPosts);
 adminArticleRouter.post("/", validateCreatePost, createPost);
 adminArticleRouter.post(
     "/:postId/comments",
@@ -30,6 +32,7 @@ adminArticleRouter.post(
     validateCreateMemberComment,
     createMemberComment,
 );
+adminArticleRouter.patch("/:id/status", validatePostId, updatePostStatus);
 adminArticleRouter.get("/:id", validatePostId, getPostById);
 adminArticleRouter.patch(
     "/:id",
